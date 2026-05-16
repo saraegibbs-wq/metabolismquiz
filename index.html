@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What's Your Metabolism Type? — Sara Gibbs Fitness</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+  :root {
+    --pink: #FF1493;
+    --pink-light: #ff4daa;
+    --pink-pale: #fff0f8;
+    --lav: #C9A0DC;
+    --dark: #111111;
+    --dark2: #1a1a1a;
+  }
+ 
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #0e0e0e;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    position: relative;
+    overflow-x: hidden;
+  }
+ 
+  body::before {
+    content: '';
+    position: fixed;
+    top: -40%; left: -20%;
+    width: 70%; height: 70%;
+    background: radial-gradient(circle, rgba(255,20,147,0.12) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -30%; right: -15%;
+    width: 60%; height: 60%;
+    background: radial-gradient(circle, rgba(201,160,220,0.1) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+ 
+  .quiz-shell { position: relative; z-index: 1; width: 100%; max-width: 580px; }
+ 
+  .quiz-header { text-align: center; margin-bottom: 1.5rem; }
+  .brand-name { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--pink); margin-bottom: 0.5rem; }
+  .quiz-title { font-family: 'Playfair Display', serif; font-size: clamp(26px, 5vw, 34px); color: #fff; line-height: 1.15; margin-bottom: 0.4rem; }
+  .quiz-title em { color: var(--pink); font-style: italic; }
+  .quiz-subtitle { font-size: 13px; color: #999; line-height: 1.6; }
+ 
+  .card { background: var(--dark2); border-radius: 20px; border: 1px solid rgba(255,255,255,0.07); overflow: hidden; box-shadow: 0 24px 80px rgba(0,0,0,0.5); }
+ 
+  .progress-wrap { padding: 1.2rem 1.6rem 0; }
+  .progress-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+  .progress-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #555; }
+  .progress-count { font-size: 10px; color: var(--pink); font-weight: 600; }
+  .progress-bar-bg { height: 3px; background: rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--pink), var(--lav)); border-radius: 10px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); width: 0%; }
+ 
+  .panel { padding: 1.6rem; display: none; animation: fadeUp 0.4s ease forwards; }
+  .panel.active { display: block; }
+ 
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+ 
+  .q-number { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--pink); margin-bottom: 0.5rem; font-weight: 600; }
+  .q-text { font-family: 'Playfair Display', serif; font-size: clamp(17px, 3.5vw, 21px); color: #fff; line-height: 1.3; margin-bottom: 1.2rem; }
+ 
+  .options { display: flex; flex-direction: column; gap: 0.55rem; }
+  .option-btn {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 0.9rem 1.1rem;
+    text-align: left; cursor: pointer; transition: all 0.2s ease;
+    display: flex; align-items: center; gap: 0.75rem;
+    color: #bbb; font-size: 13.5px; font-family: 'DM Sans', sans-serif;
+    line-height: 1.4; width: 100%;
+  }
+  .option-btn:hover { background: rgba(255,20,147,0.1); border-color: rgba(255,20,147,0.3); color: #fff; transform: translateX(4px); }
+  .option-btn.selected { background: rgba(255,20,147,0.15); border-color: var(--pink); color: #fff; }
+  .option-letter {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: #666; flex-shrink: 0; transition: all 0.2s;
+  }
+  .option-btn:hover .option-letter, .option-btn.selected .option-letter { background: var(--pink); color: #fff; }
+ 
+  /* INTRO */
+  .intro-panel { padding: 2rem 1.6rem; text-align: center; }
+  .intro-icon { font-size: 44px; margin-bottom: 1rem; display: block; }
+  .intro-headline { font-family: 'Playfair Display', serif; font-size: 22px; color: #fff; margin-bottom: 0.6rem; line-height: 1.2; }
+  .intro-headline em { color: var(--pink); }
+  .intro-body { font-size: 13.5px; color: #999; line-height: 1.7; margin-bottom: 0.8rem; max-width: 420px; margin-left: auto; margin-right: auto; }
+  .intro-quote { font-family: 'Playfair Display', serif; font-size: 13px; font-style: italic; color: var(--lav); border-left: 2px solid var(--lav); padding-left: 0.8rem; text-align: left; margin: 0 auto 1.4rem; max-width: 400px; line-height: 1.6; }
+  .intro-chips { display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.6rem; }
+  .chip { background: rgba(255,20,147,0.1); border: 1px solid rgba(255,20,147,0.25); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: var(--pink); }
+  .start-btn {
+    background: var(--pink); color: #fff; border: none; border-radius: 50px;
+    padding: 0.9rem 2.5rem; font-size: 15px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 8px 32px rgba(255,20,147,0.35);
+  }
+  .start-btn:hover { background: var(--pink-light); transform: translateY(-2px); box-shadow: 0 12px 40px rgba(255,20,147,0.45); }
+ 
+  /* RESULTS */
+  .result-panel { padding: 0; display: none; animation: fadeUp 0.5s ease forwards; }
+  .result-panel.active { display: block; }
+ 
+  .result-hero { padding: 2rem 1.6rem 1.4rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .result-type-badge { display: inline-block; background: rgba(255,20,147,0.15); border: 1px solid rgba(255,20,147,0.3); border-radius: 20px; padding: 4px 14px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--pink); margin-bottom: 0.8rem; font-weight: 600; }
+  .result-headline { font-family: 'Playfair Display', serif; font-size: clamp(22px, 4.5vw, 28px); color: #fff; line-height: 1.2; margin-bottom: 0.6rem; }
+  .result-headline em { color: var(--pink); font-style: italic; }
+  .result-tagline { font-size: 13px; color: #999; line-height: 1.65; max-width: 440px; margin: 0 auto; }
+ 
+  .result-body { padding: 1.4rem 1.6rem; }
+ 
+  .section-label { font-size: 9.5px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--pink); font-weight: 700; margin-bottom: 0.7rem; display: flex; align-items: center; gap: 8px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,20,147,0.2); }
+ 
+  .what-happening { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 1rem 1.2rem; border-left: 3px solid var(--pink); font-size: 13.5px; color: #ccc; line-height: 1.75; margin-bottom: 1.2rem; }
+  .what-happening strong { color: #fff; }
+ 
+  .traits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; margin-bottom: 1.2rem; }
+  .trait-chip { background: rgba(201,160,220,0.07); border: 1px solid rgba(201,160,220,0.2); border-radius: 8px; padding: 0.45rem 0.65rem; font-size: 12px; color: var(--lav); display: flex; align-items: center; gap: 6px; }
+  .trait-chip::before { content: '✦'; font-size: 8px; flex-shrink: 0; }
+ 
+  .this-week-box { background: rgba(255,20,147,0.08); border: 1px solid rgba(255,20,147,0.2); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 1.2rem; }
+  .this-week-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--pink); font-weight: 700; margin-bottom: 0.4rem; }
+  .this-week-text { font-size: 13.5px; color: #fff; line-height: 1.65; }
+ 
+  .villain-callout { background: rgba(255,255,255,0.03); border-radius: 10px; padding: 0.8rem 1rem; border: 1px solid rgba(255,255,255,0.07); margin-bottom: 1.2rem; font-size: 12.5px; color: #aaa; line-height: 1.6; }
+  .villain-callout strong { color: var(--lav); display: block; margin-bottom: 3px; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+ 
+  .cta-box { background: #111; border-radius: 14px; padding: 1.3rem 1.4rem; text-align: center; border: 1px solid rgba(255,20,147,0.2); }
+  .cta-eyebrow { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--pink); margin-bottom: 0.4rem; }
+  .cta-headline { font-family: 'Playfair Display', serif; font-size: 18px; color: #fff; margin-bottom: 0.4rem; line-height: 1.3; }
+  .cta-sub { font-size: 12px; color: #777; margin-bottom: 1rem; line-height: 1.6; }
+  .cta-btn { display: block; width: 100%; background: var(--pink); color: #fff; border: none; border-radius: 50px; padding: 0.85rem 1.8rem; font-size: 14px; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; text-decoration: none; transition: all 0.2s; box-shadow: 0 6px 24px rgba(255,20,147,0.3); margin-bottom: 0.7rem; }
+  .cta-btn:hover { background: var(--pink-light); transform: translateY(-2px); box-shadow: 0 10px 32px rgba(255,20,147,0.4); }
+  .cta-keyword { font-size: 11.5px; color: #555; }
+  .cta-keyword strong { color: var(--pink); }
+ 
+  .retake-btn { background: none; border: 1px solid rgba(255,255,255,0.08); color: #555; border-radius: 50px; padding: 0.6rem 1.4rem; font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer; margin-top: 0.9rem; transition: all 0.2s; width: 100%; }
+  .retake-btn:hover { color: #aaa; border-color: rgba(255,255,255,0.18); }
+ 
+  .footer-note { text-align: center; margin-top: 1rem; font-size: 11px; color: #333; }
+  .footer-note span { color: var(--pink); }
+ 
+  @media (max-width: 480px) {
+    .traits-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+ 
+<div class="quiz-shell">
+ 
+  <div class="quiz-header">
+    <div class="brand-name">Sara Gibbs Fitness · The Metabolic Priming Method™</div>
+    <h1 class="quiz-title">What's Your <em>Metabolism</em> Type?</h1>
+    <p class="quiz-subtitle">The 2-minute quiz for high-achieving moms 40+ who are tired of doing everything right and getting nowhere</p>
+  </div>
+ 
+  <div class="card" id="quizCard">
+ 
+    <!-- INTRO -->
+    <div class="intro-panel" id="introPanel">
+      <span class="intro-icon">⚡</span>
+      <h2 class="intro-headline">Your metabolism isn't broken.<br>Your <em>strategy</em> is.</h2>
+      <p class="intro-body">You're smart. You're driven. You've crushed it in every area of your life. But no matter what you try — the scale won't budge, the energy won't come back, and the clothes keep getting tighter. It's not you. It's your approach.</p>
+      <div class="intro-quote">"Fitness should help you feel stronger for your calling, not consume your life."<br><span style="font-style:normal;font-size:11px;color:#666;">— Sara Gibbs</span></div>
+      <div class="intro-chips">
+        <span class="chip">2 minutes</span>
+        <span class="chip">5 questions</span>
+        <span class="chip">Personalized result</span>
+        <span class="chip">No email required</span>
+      </div>
+      <button class="start-btn" onclick="startQuiz()">Find My Metabolism Type →</button>
+    </div>
+ 
+    <!-- PROGRESS -->
+    <div class="progress-wrap" id="progressWrap" style="display:none;">
+      <div class="progress-meta">
+        <span class="progress-label">Your Progress</span>
+        <span class="progress-count" id="progressCount">Question 1 of 5</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+    </div>
+ 
+    <!-- Q1 -->
+    <div class="panel" id="q1">
+      <div class="q-number">Question 1 of 5</div>
+      <div class="q-text">Be honest — which of these sounds most like your day-to-day right now?</div>
+      <div class="options">
+        <button class="option-btn" onclick="answer(1,'a')"><span class="option-letter">A</span>
+          I'm wired at night but completely crash by 3pm — running on stress and caffeine to get through the day
+        </button>
+        <button class="option-btn" onclick="answer(1,'b')"><span class="option-letter">B</span>
+          I'm exhausted all day no matter how much I sleep — like my body just won't cooperate
+        </button>
+        <button class="option-btn" onclick="answer(1,'c')"><span class="option-letter">C</span>
+          I feel fine during the week but the weekend derails me every single time — and I'm so tired of starting over
+        </button>
+      </div>
+    </div>
+ 
+    <!-- Q2 -->
+    <div class="panel" id="q2">
+      <div class="q-number">Question 2 of 5</div>
+      <div class="q-text">When it comes to food and your body, which feels most true right now?</div>
+      <div class="options">
+        <button class="option-btn" onclick="answer(2,'a')"><span class="option-letter">A</span>
+          I crave sugar and carbs constantly — especially in the afternoon — then feel guilty
+        </button>
+        <button class="option-btn" onclick="answer(2,'b')"><span class="option-letter">B</span>
+          I barely eat but still gain weight — my metabolism feels completely broken
+        </button>
+        <button class="option-btn" onclick="answer(2,'c')"><span class="option-letter">C</span>
+          I track everything, eat "perfectly" Monday–Friday, then the weekend undoes it all
+        </button>
+      </div>
+    </div>
+ 
+    <!-- Q3 -->
+    <div class="panel" id="q3">
+      <div class="q-number">Question 3 of 5</div>
+      <div class="q-text">Which describes your relationship with exercise right now?</div>
+      <div class="options">
+        <button class="option-btn" onclick="answer(3,'a')"><span class="option-letter">A</span>
+          I'm doing cardio or HIIT constantly — working my tail off but the scale and my body aren't moving
+        </button>
+        <button class="option-btn" onclick="answer(3,'b')"><span class="option-letter">B</span>
+          I already lift weights and eat well — I'm doing everything "right" and my body still isn't responding
+        </button>
+        <button class="option-btn" onclick="answer(3,'c')"><span class="option-letter">C</span>
+          I'm too exhausted or overwhelmed to show up consistently — I start strong then life takes over
+        </button>
+      </div>
+    </div>
+ 
+    <!-- Q4 -->
+    <div class="panel" id="q4">
+      <div class="q-number">Question 4 of 5</div>
+      <div class="q-text">Which of these feels closest to your biggest struggle right now?</div>
+      <div class="options">
+        <button class="option-btn" onclick="answer(4,'a')"><span class="option-letter">A</span>
+          Exhausted by 3pm, wired at night, mood swings, belly fat that won't budge
+        </button>
+        <button class="option-btn" onclick="answer(4,'b')"><span class="option-letter">B</span>
+          Brain fog, feeling cold, low motivation, slow despite "trying everything"
+        </button>
+        <button class="option-btn" onclick="answer(4,'c')"><span class="option-letter">C</span>
+          Stuck in all-or-nothing thinking, feeling like I fail every week, can't stay consistent
+        </button>
+      </div>
+    </div>
+ 
+    <!-- Q5 -->
+    <div class="panel" id="q5">
+      <div class="q-number">Question 5 of 5</div>
+      <div class="q-text">If you're being really honest, what's the deepest fear underneath all of this?</div>
+      <div class="options">
+        <button class="option-btn" onclick="answer(5,'a')"><span class="option-letter">A</span>
+          I'm terrified my hormones and metabolism are so out of control it's impossible to fix
+        </button>
+        <button class="option-btn" onclick="answer(5,'b')"><span class="option-letter">B</span>
+          I'm scared I'm becoming invisible — losing my energy, my body, and my confidence
+        </button>
+        <button class="option-btn" onclick="answer(5,'c')"><span class="option-letter">C</span>
+          I'm afraid I'll look back at photos with my kids and feel regret about how I let myself go
+        </button>
+      </div>
+    </div>
+ 
+    <!-- RESULT A: THE CORTISOL BURNOUT -->
+    <div class="result-panel" id="resultA">
+      <div class="result-hero">
+        <div class="result-type-badge">Your Metabolism Type</div>
+        <h2 class="result-headline">The <em>Cortisol Burnout</em></h2>
+        <p class="result-tagline">Your metabolism isn't slow — it's been hijacked by stress hormones. The harder you push, the more your body holds on. This isn't a willpower problem. It's a cortisol problem.</p>
+      </div>
+      <div class="result-body">
+ 
+        <div class="section-label">What's actually happening</div>
+        <div class="what-happening">
+          You're managing a career, kids' schedules, the mental load of running a household — and then layering on restrictive diets and hard workouts on top of that. Here's the problem: <strong>your body is already running on elevated cortisol.</strong> When you add more restriction and more cardio, you compound the stress on a system that's already maxed out. Cortisol tells your body it's in danger — so it holds onto fat, especially around your belly, for emergency fuel. The afternoon crash, the sugar cravings, the wired-but-tired feeling at night? All cortisol. The good news: this responds powerfully and quickly to the right approach.
+        </div>
+ 
+        <div class="section-label">Signs you're this type</div>
+        <div class="traits-grid">
+          <div class="trait-chip">3pm energy crash</div>
+          <div class="trait-chip">Wired at night, tired all day</div>
+          <div class="trait-chip">Sugar & carb cravings</div>
+          <div class="trait-chip">Belly fat that won't move</div>
+          <div class="trait-chip">Cardio not helping</div>
+          <div class="trait-chip">Mood swings & bloating</div>
+        </div>
+ 
+        <div class="villain-callout">
+          <strong>Why what you've tried hasn't worked</strong>
+          More cardio raises cortisol further — it's actively working against you. Low-carb diets spike cortisol too. You've been following advice designed for a 25-year-old with normal hormone levels. The Metabolic Priming Method™ is built specifically for THIS.
+        </div>
+ 
+        <div class="section-label">Your move this week</div>
+        <div class="this-week-box">
+          <div class="this-week-label">One action step</div>
+          <div class="this-week-text">Replace one cardio session with a 30-minute strength training workout and eat 25–30g of protein within an hour of waking. This alone starts shifting your cortisol pattern and signals your metabolism it's safe to let go of fat.</div>
+        </div>
+ 
+        <div class="cta-box">
+          <div class="cta-eyebrow">Ready to reset your metabolism?</div>
+          <div class="cta-headline">Let's build your personal plan</div>
+          <div class="cta-sub">DM me on Instagram — I help high-achieving moms 40+ lose 15–20 lbs and reclaim steady energy in 12 weeks using the Metabolic Priming Method™. No cardio required. No carb-cutting. No calendar chaos.</div>
+          <a class="cta-btn" href="https://instagram.com/saragibbsfitness" target="_blank">Message Me on Instagram →</a>
+          <div class="cta-keyword">DM me the word <strong>STRONG</strong> to get started</div>
+        </div>
+        <button class="retake-btn" onclick="retake()">← Retake the quiz</button>
+      </div>
+    </div>
+ 
+    <!-- RESULT B: THE SLOW BURN -->
+    <div class="result-panel" id="resultB">
+      <div class="result-hero">
+        <div class="result-type-badge">Your Metabolism Type</div>
+        <h2 class="result-headline">The <em>Metabolic Adaptation</em> Type</h2>
+        <p class="result-tagline">Your metabolism hasn't broken down — it's adapted to protect you. Years of under-eating and overtraining have taught your body to survive on less. The fix isn't more restriction. It's a full reset.</p>
+      </div>
+      <div class="result-body">
+ 
+        <div class="section-label">What's actually happening</div>
+        <div class="what-happening">
+          After years of dieting, your metabolism has learned to function on very little food. It's not broken — it's <strong>adapted to protect you from what it perceives as a famine.</strong> When you eat less, your body slows everything down: metabolism, thyroid function, energy output. Add hormone shifts from perimenopause and you get brain fog, feeling cold, low motivation, and weight gain even when you're barely eating. This is metabolic adaptation — and it's incredibly common in high-achieving women who've spent years being "good." The answer is counterintuitive: you likely need to eat MORE, not less.
+        </div>
+ 
+        <div class="section-label">Signs you're this type</div>
+        <div class="traits-grid">
+          <div class="trait-chip">Low energy all day</div>
+          <div class="trait-chip">Gaining weight eating less</div>
+          <div class="trait-chip">Brain fog & low motivation</div>
+          <div class="trait-chip">Feel cold often</div>
+          <div class="trait-chip">Hair or skin changes</div>
+          <div class="trait-chip">Tried "everything" — nothing works</div>
+        </div>
+ 
+        <div class="villain-callout">
+          <strong>Why what you've tried hasn't worked</strong>
+          Every restrictive diet made this worse. Your doctor ran basic labs, said "you're fine," and told you to eat less and move more. But basic labs don't show metabolic adaptation or cortisol dysregulation. You're not crazy — your symptoms are real. And there's a real fix.
+        </div>
+ 
+        <div class="section-label">Your move this week</div>
+        <div class="this-week-box">
+          <div class="this-week-label">One action step</div>
+          <div class="this-week-text">Start eating MORE — specifically protein. Aim for at least 100g of protein per day and add two strength sessions this week. Under-eating is likely slowing your metabolism further. Your body needs a clear signal that food is safe and that building muscle is the goal — not surviving a diet.</div>
+        </div>
+ 
+        <div class="cta-box">
+          <div class="cta-eyebrow">Ready to wake your metabolism up?</div>
+          <div class="cta-headline">Let's build your personal plan</div>
+          <div class="cta-sub">DM me on Instagram — I help high-achieving moms 40+ lose 15–20 lbs and reclaim steady energy in 12 weeks using the Metabolic Priming Method™. No restriction. No more starting over. No guessing.</div>
+          <a class="cta-btn" href="https://instagram.com/saragibbsfitness" target="_blank">Message Me on Instagram →</a>
+          <div class="cta-keyword">DM me the word <strong>STRONG</strong> to get started</div>
+        </div>
+        <button class="retake-btn" onclick="retake()">← Retake the quiz</button>
+      </div>
+    </div>
+ 
+    <!-- RESULT C: THE ALL-OR-NOTHING CYCLE -->
+    <div class="result-panel" id="resultC">
+      <div class="result-hero">
+        <div class="result-type-badge">Your Metabolism Type</div>
+        <h2 class="result-headline">The <em>All-or-Nothing</em> Cycle</h2>
+        <p class="result-tagline">You're not undisciplined. You're stuck in a pattern that's designed to fail. The Monday–Sunday rollercoaster isn't a character flaw — it's what happens when your strategy demands perfection and real life keeps showing up.</p>
+      </div>
+      <div class="result-body">
+ 
+        <div class="section-label">What's actually happening</div>
+        <div class="what-happening">
+          You're smart. You're successful. You've figured out harder things than this. But the all-or-nothing cycle keeps pulling you back — perfect Monday through Friday, then a weekend happens, and suddenly you're restarting again on Monday. <strong>This isn't a willpower issue. It's a strategy issue.</strong> Perfectionism-based approaches don't account for the reality of being a high-achieving mom: the last-minute work dinner, the kids' birthday party, the girls' trip. When your plan can't handle real life, real life wins. The Metabolic Priming Method™ builds your life INTO the plan from day one — weekends, date nights, and all.
+        </div>
+ 
+        <div class="section-label">Signs you're this type</div>
+        <div class="traits-grid">
+          <div class="trait-chip">Perfect M–F, derailed weekends</div>
+          <div class="trait-chip">Restarting every Monday</div>
+          <div class="trait-chip">All-or-nothing thinking</div>
+          <div class="trait-chip">Doing "everything right"</div>
+          <div class="trait-chip">Scale won't move</div>
+          <div class="trait-chip">Can't stay consistent</div>
+        </div>
+ 
+        <div class="villain-callout">
+          <strong>Why what you've tried hasn't worked</strong>
+          Every program you've tried demanded perfection — and punished you for being human. Generic macro tracking doesn't account for your hormones, your schedule, or the reality of family dinners and date nights. You don't need more discipline. You need a plan built for real life.
+        </div>
+ 
+        <div class="section-label">Your move this week</div>
+        <div class="this-week-box">
+          <div class="this-week-label">One action step</div>
+          <div class="this-week-text">Stop trying to be perfect. Aim for 80% consistency this week — that means you can have one real meal out, one dessert, one glass of wine, and STILL make progress. Write down your three non-negotiables (protein at every meal, two strength sessions, 7 hours of sleep) and let everything else be flexible. Progress over perfection — always.</div>
+        </div>
+ 
+        <div class="cta-box">
+          <div class="cta-eyebrow">Ready to break the cycle for good?</div>
+          <div class="cta-headline">Let's build your personal plan</div>
+          <div class="cta-sub">DM me on Instagram — I help high-achieving moms 40+ lose 15–20 lbs and reclaim steady energy in 12 weeks using the Metabolic Priming Method™. Date nights included. Weekends included. Real life included.</div>
+          <a class="cta-btn" href="https://instagram.com/saragibbsfitness" target="_blank">Message Me on Instagram →</a>
+          <div class="cta-keyword">DM me the word <strong>STRONG</strong> to get started</div>
+        </div>
+        <button class="retake-btn" onclick="retake()">← Retake the quiz</button>
+      </div>
+    </div>
+ 
+  </div>
+ 
+  <div class="footer-note">By <span>@saragibbsfitness</span> · Helping professional moms 40+ build strength, energy & confidence through realistic fitness</div>
+ 
+</div>
+ 
+<script>
+  const answers = {};
+ 
+  function startQuiz() {
+    document.getElementById('introPanel').style.display = 'none';
+    document.getElementById('progressWrap').style.display = 'block';
+    showQuestion(1);
+  }
+ 
+  function showQuestion(n) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById('q' + n);
+    if (panel) {
+      panel.classList.add('active');
+      updateProgress(n);
+    }
+  }
+ 
+  function updateProgress(n) {
+    document.getElementById('progressFill').style.width = ((n - 1) / 5 * 100) + '%';
+    document.getElementById('progressCount').textContent = 'Question ' + n + ' of 5';
+  }
+ 
+  function answer(q, choice) {
+    answers[q] = choice;
+    event.currentTarget.closest('.panel').querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    setTimeout(() => {
+      if (q < 5) {
+        showQuestion(q + 1);
+      } else {
+        showResult();
+      }
+    }, 380);
+  }
+ 
+  function showResult() {
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('progressCount').textContent = 'Complete!';
+    setTimeout(() => {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('progressWrap').style.display = 'none';
+      const scores = { a: 0, b: 0, c: 0 };
+      Object.values(answers).forEach(v => { if (scores[v] !== undefined) scores[v]++; });
+      let type = 'A';
+      if (scores.b > scores.a && scores.b >= scores.c) type = 'B';
+      else if (scores.c > scores.a && scores.c > scores.b) type = 'C';
+      document.getElementById('result' + type).classList.add('active');
+      document.getElementById('quizCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 300);
+  }
+ 
+  function retake() {
+    Object.keys(answers).forEach(k => delete answers[k]);
+    document.querySelectorAll('.result-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('introPanel').style.display = 'block';
+    document.getElementById('progressWrap').style.display = 'none';
+    document.getElementById('progressFill').style.width = '0%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
